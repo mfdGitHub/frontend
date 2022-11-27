@@ -1,22 +1,21 @@
-function search(){
-    var resultado = [
-        {
-          "id": 5,
-          "address": "Av. San roque 312",
-          "email": "victoriaperez@yahoo.com",
-          "firstname": "Ray",
-          "lastname": "Perez",
-          "phone": "90909090909"
-        },
-        {
-          "id": 9,
-          "address": "Av. San roque 312",
-          "email": "victoriaperez@yahoo.com",
-          "firstname": "Lucas",
-          "lastname": "Moy",
-          "phone": "90909090909"
-        }
-    ]
+document.addEventListener("DOMContentLoaded", init)
+const URL_API = 'http://localhost:3000/api/'
+
+function init(){
+  search()
+}
+
+async function search(){
+    var url = URL_API + 'customers'
+    var response = await fetch(url, {
+      "method": 'GET',
+      "headers": {
+        "Content-Type": 'application/json'
+      }
+    })
+    var resultado = await response.json();
+
+    console.log(resultado)
 
     var row = `
                 <tr>
@@ -30,7 +29,8 @@ function search(){
                     </td>
                 </tr>    
  
-                `
+              `
     
-    document.query
+    document.querySelector('#customers > tbody').outerHTML = row
 }
+
