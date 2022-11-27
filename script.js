@@ -29,5 +29,8 @@ function search(){
                         <a href="#" class="btnDelete">Elimiar</a>
                     </td>
                 </tr>    
-            `
+ 
+                `
+    
+    document.query
 }
