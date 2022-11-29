@@ -1,9 +1,27 @@
 document.addEventListener("DOMContentLoaded", init)
-const URL_API = 'http://localhost:3000/api/'
+const URL_API = 'http://127.0.0.1:3000/api/'
+
+var customers = []
 
 function init(){
   search()
 }
+
+function agregar(){
+  clean()
+  abrirFormulario()
+}
+
+function abrirFormulario(){
+  htmlModal = document.getElementById("modal");
+  htmlModal.setAttribute("class", "modale opened")
+}
+
+function cerrarModal(){
+  htmlModal = document.getElementById("modal");
+  htmlModal.setAttribute("class", "modale")
+}
+
 
 async function search(){
     var url = URL_API + 'customers'
@@ -13,24 +31,90 @@ async function search(){
         "Content-Type": 'application/json'
       }
     })
-    var resultado = await response.json();
+    
+    customers = await response.json();
+    
+    var html = ''
 
-    console.log(resultado)
-
-    var row = `
+    for(customer of customers){
+      var row = `
                 <tr>
-                    <td>Pepe</td>
-                    <td>Angelini</td>
-                    <td>pep.angelini@gmail.com</td>
-                    <td>4534534</td>
+                    <td>${customer.firstname}</td>
+                    <td>${customer.lastname}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.phone}</td>
                     <td>
-                        <a href="#" class="myButton">Editar</a>
-                        <a href="#" class="btnDelete">Elimiar</a>
+                        <a href="#" onclick="edit(${customer.id})" class="myButton">Editar</a>
+                        <a href="#" onclick="remove(${customer.id})" class="btnDelete">Elimiar</a>
                     </td>
                 </tr>    
  
               `
-    
-    document.querySelector('#customers > tbody').outerHTML = row
+      html = html + row;
+    }
+
+    document.querySelector('#customers > tbody').outerHTML = html
 }
+
+function edit(id){
+  abrirFormulario()
+  var customer = customers.find(x => x.id == id)
+  
+  document.getElementById('txtId').value = customer.id
+  document.getElementById('txtFirstname').value = customer.firstname
+  document.getElementById('txtLastname').value = customer.lastname
+  document.getElementById('txtPhone').value = customer.phone
+  document.getElementById('txtEmail').value = customer.email
+  document.getElementById('txtAddress').value = customer.address
+}
+
+function clean(){
+  document.getElementById('txtId').value = ''
+  document.getElementById('txtFirstname').value = ''
+  document.getElementById('txtLastname').value = ''
+  document.getElementById('txtPhone').value = ''
+  document.getElementById('txtEmail').value = ''
+  document.getElementById('txtAddress').value = ''
+}
+
+async function save(){
+  
+  var data = {
+    "address": document.getElementById('txtAddress').value,
+    "email": document.getElementById('txtEmail').value,
+    "firstname": document.getElementById('txtFirstname').value,
+    "lastname": document.getElementById('txtLastname').value,
+    "phone": document.getElementById('txtPhone').value
+  }
+
+  var id = document.getElementById('txtId').value
+  if(id != ''){
+    data.id = id
+  }  
+
+  var url = URL_API + 'customers'
+  await fetch(url, {
+    "method": 'POST',
+    "body": JSON.stringify(data),
+    "headers": {
+      "Content-Type": 'application/json'
+    }
+  })
+  window.location.reload()
+}
+
+async function remove(id){
+  respuesta = confirm('¿Estás seguro de eliminarlo?')
+  if(respuesta){
+    var url = URL_API + 'customers/' + id
+    await fetch(url, {
+      "method": 'DELETE',
+      "headers": {
+        "Content-Type": 'application/json'
+      }
+    })
+  }
+  window.location.reload();
+}
+
 
